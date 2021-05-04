@@ -1,24 +1,23 @@
-# Fedex domestic shipment autofill
+# Fedex domestic shipment autofill for GeoOrbital wheels
 
 
 
 
 TODO:
-parse address into corrent labels from user
-- from file or from clipboard?
--- Name
--- Address
--- Address#2 [optional]
--- Town, State-abrv, Zip
+parse address from file or clipboard into it's components
+- Name
+- Address
+- Address#2 [optional]
+- Town, State, Zip
 
 get package options from user
 - dimensions
 - weight
 	
 		
-- log into fedex website
-- direct to create shipment
-- plug in all values captured previously
-- submit
-- print label to pdf folder on desktop
+log into fedex website
+direct to create shipment
+plug in all values captured previously
+submit
+print label to pdf folder on desktop
 

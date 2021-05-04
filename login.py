@@ -12,7 +12,10 @@ options = webdriver.ChromeOptions()
 options.binary_location = r"/usr/bin/google-chrome-stable"
 executable_path = os.path.dirname(os.path.abspath(__file__)) + "/chromedriver"
 
+class InputError(Exception): pass
+
 def main():
+
     addr_file = sys.argv[1:]
     if addr_file:
         with open('./file.txt', 'r') as f:
@@ -23,8 +26,22 @@ def main():
         addr = pc.paste().split('\n')
 
     split_address = [add.strip() for add in addr]
+    split_address = [s.replace(',','').replace('.','') for s in split_address]
 
-    print(split_address)
+    name, address, *address2, townStateZip = split_address
+    
+    if address2:
+        assert len(address2) == 1
+        address2, = address2
+
+    town, state, zip_code = townStateZip.split()
+
+    if address2:
+        print(name, address, address2, town, state, zip_code)
+    else:
+        print(name, address, town, state, zip_code)
+    
+    
 
 
 
