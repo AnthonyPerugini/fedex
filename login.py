@@ -16,9 +16,12 @@ def main():
 
     assert len(sys.argv) <= 2
     addr_file = sys.argv[1:]
+    if addr_file:
+        addr_file, = addr_file
 
     parser = AddressParser(addr_file)
     parser.dump()
+    
 
     
 
