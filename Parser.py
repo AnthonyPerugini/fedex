@@ -1,7 +1,7 @@
 import pyperclip as pc
 
 class AddressParser(object):
-    def __init__(self, file):
+    def __init__(self, file=None):
         if file:
             self.file = file
         else:
@@ -14,9 +14,7 @@ class AddressParser(object):
         print(self.address)
         if self.address2 is not None:
             print(self.address2)
-        print(self.town)
-        print(self.state)
-        print(self.zip)
+        print(self.town, self.state, self.zip)
 
     def split_address(self):
         if self.file:
@@ -50,5 +48,5 @@ class AddressParser(object):
         self.zip = zip_code
 
 if __name__ == '__main__':
-    p = AddressParser('file.txt')
+    p = AddressParser()
     p.dump()
