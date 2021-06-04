@@ -16,6 +16,15 @@ class AddressParser(object):
             print(self.address2)
         print(self.town, self.state, self.zip)
 
+    def clean_address(self, addr):
+        split_address = [add.strip() for add in addr]
+        split_address = filter(lambda x: x, split_address)
+
+        for char in (',','.','\n','\r',):
+            split_address = [s.replace(char,'') for s in split_address]
+
+        return split_address
+
     def split_address(self):
         if self.file:
             with open(self.file, 'r') as f:
@@ -25,13 +34,7 @@ class AddressParser(object):
             # get address from clipboard if no file
             addr = pc.paste().split('\n')
 
-        split_address = [add.strip() for add in addr]
-        split_address = filter(lambda x: x, split_address)
-
-        for char in (',','.','\n','\r',):
-            split_address = [s.replace(char,'') for s in split_address]
-
-        name, address, *address2, townStateZip = split_address
+        name, address, *address2, townStateZip = self.clean_address(addr)
 
         if address2:
             assert len(address2) == 1

@@ -8,13 +8,15 @@ TODO:
 	- Town, State, Zip
 
 - [ ] Get package options from user
-	- dimensions
-	- weight
-	
+
+	- OPTIONS:
+		- Wheel
+		- Battery
+		- Charger Box
 		
 - [ ] Log into fedex website
 - [ ] Direct to create shipment
-- [ ] Plug in all values captured previously
-- [ ] Submit
+- [ ] Plug in all shipment values
+- [ ] Confirm submit
 - [ ] Print label to pdf folder on desktop
 
