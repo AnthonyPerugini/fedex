@@ -1,7 +1,9 @@
 import sys
 import os
+import urllib
 from Parser import AddressParser
 from time import sleep
+import datetime
 from getpass import getpass
 
 from selenium import webdriver
@@ -30,10 +32,17 @@ def main():
         addr_file = None
 
     parser = AddressParser(addr_file)
-    # parser.dump()
 
     opt = input('0 for wheel, 1 for battery, 2 for charger: ')
     (length, width, height), weight = {'0': ([28 ,28 ,8], 30), '1': ([8, 8, 16], 8), '2': ([6, 9, 2], 4)}[opt]
+
+    print('confirm parameters below:\n--------')
+    parser.dump()
+    print('Length, Width, Height: ', length, '" x ', width, '" x ', height, '"', sep='')
+    print('Weight: ', weight, 'lbs')
+    print('--------')
+    if input('[y]/n?: ') == 'n':
+        exit()
 
     with webdriver.Chrome(executable_path=executable_path, options=options) as driver:
 
@@ -94,9 +103,10 @@ def main():
         state_input.select_by_value(parser.state)
 
         # TODO: phone number sometimes doesn't input correctly.  Need to figure out why
-        sleep(0.25)
+        sleep(.5)
         input_field_by_xpath('//*[@id="toData.phoneNumber"]', '9785059671')
-        sleep(0.25)
+        sleep(.5)
+        driver.find_element_by_xpath('//*[@id="toData.phoneNumberExt"]').click()
 
         if parser.address2:
             input_field_by_xpath('//*[@id="toData.addressLine2"]', parser.address2)
@@ -120,6 +130,18 @@ def main():
                             EC.element_to_be_clickable((By.XPATH, '//*[@id="psd.mps.row.dimensionHeight.0"]'))).send_keys(height)
 
         input_field_by_xpath('//*[@id="psd.mps.row.weight.0"]', weight)
+
+        WebDriverWait(driver, 10).until(
+                            EC.element_to_be_clickable((By.XPATH, '//*[@id="completeShip.ship.field"]'))).click()
+
+        WebDriverWait(driver, 10).until(
+                            EC.element_to_be_clickable((By.XPATH, '//*[@id="confirm.ship.field"]'))).click()
+
+        WebDriverWait(driver, 10).until(
+                            EC.element_to_be_clickable((By.XPATH, '//*[@id="labelImage"]')))
+
+        with open('/mnt/c/Users/Anthony/OneDrive/Desktop/fedex_pdfs/' + datetime.datetime.now().strftime('%c') + '-' + parser.name + '.png', 'wb') as f:
+            f.write(driver.find_element_by_xpath('//*[@id="labelImage"]').screenshot_as_png)
 
 
         

@@ -17,6 +17,6 @@ TODO:
 - [x] Log into fedex website
 - [x] Direct to create shipment
 - [x] Plug in all shipment values
-- [ ] Confirm submit
-- [ ] Print label to pdf folder on desktop
+- [x] Confirm submit
+- [x] Print label to pdf folder on desktop
 

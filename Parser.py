@@ -10,11 +10,11 @@ class AddressParser(object):
         self.split_address()
 
     def dump(self):
-        print(self.name)
-        print(self.address)
+        print('Full Name: ', self.name)
+        print('Address1: ', self.address)
         if self.address2 is not None:
-            print(self.address2)
-        print(self.town, self.state, self.zip)
+            print('Address2: ', self.address2)
+        print('City, State, Zip: ', self.town, self.state, self.zip)
 
     def clean_address(self, addr):
         split_address = [add.strip() for add in addr]
