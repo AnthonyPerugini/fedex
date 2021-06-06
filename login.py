@@ -5,23 +5,22 @@ from time import sleep
 from getpass import getpass
 
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.ui import Select
 
 options = webdriver.ChromeOptions()
-# options.add_argument("--disable-blink-features=AutomationControlled")
+options.add_argument("--disable-blink-features=AutomationControlled")
 options.binary_location = r"/usr/bin/google-chrome-stable"
 executable_path = os.path.dirname(os.path.abspath(__file__)) + "/chromedriver"
 
-USERNAME = 'geoorbital'
-
 def main():
 
-    # for personal use
+    # personal creds
     with open('pass.txt') as f:
-        pswd = f.read().strip()
+        username, pswd = f.read().split()
 
     assert len(sys.argv) <= 2
     addr_file = sys.argv[1:]
@@ -31,24 +30,105 @@ def main():
         addr_file = None
 
     parser = AddressParser(addr_file)
-    parser.dump()
+    # parser.dump()
+
+    opt = input('0 for wheel, 1 for battery, 2 for charger: ')
+    (length, width, height), weight = {'0': ([28 ,28 ,8], 30), '1': ([8, 8, 16], 8), '2': ([6, 9, 2], 4)}[opt]
 
     with webdriver.Chrome(executable_path=executable_path, options=options) as driver:
-        # login to Github
+
+        # Login to FedEx
         driver.get('https://www.fedex.com/en-us/home.html')
 
         driver.find_element_by_id('fxg-dropdown-signIn').click()
 
-        username_field = WebDriverWait(driver, 10).until(
-                            EC.element_to_be_clickable((By.NAME, 'user'))).send_keys('geoorbital')
+        count = 0
 
-        password_field = WebDriverWait(driver, 10).until(
-                            EC.element_to_be_clickable((By.NAME, 'pwd'))).send_keys(pswd)
+        while driver.find_element_by_xpath('//*[@id="fxg-dropdown-signIn"]/span').text == 'Sign Up or Log In' and count < 5:
 
-        driver.find_element_by_xpath('/html/body/div[1]/header/div/div/nav/div/div/div/div[1]/div/div/form/button').click()
+            username_field = WebDriverWait(driver, 10).until(
+                                EC.element_to_be_clickable((By.NAME, 'user')))
 
-        sleep(20)
+            username_field.send_keys(Keys.CONTROL, 'a')
+            username_field.send_keys(username)
+
+            password_field = WebDriverWait(driver, 10).until(
+                                EC.element_to_be_clickable((By.NAME, 'pwd')))
+
+            password_field.send_keys(Keys.CONTROL, 'a')
+            password_field.send_keys(pswd)
+
+            driver.find_element_by_xpath('/html/body/div[1]/header/div/div/nav/div/div/div/div[1]/div/div/form/button').click()
+            sleep(1)
+            count += 1
+        
+        if count == 5:
+            print('failed to login')
+            exit()
+
+        # Open shipping tab
+        WebDriverWait(driver, 10).until(
+                            EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/header/div/div/nav/div/ul/div[1]/li/a/span'))).click()
+
+        WebDriverWait(driver, 10).until(
+                            EC.element_to_be_clickable((By.XPATH, 
+                            '/html/body/div[1]/header/div/div/nav/div/ul/div[1]/li/div/div[1]/div/a'))).click()
+
+        # input shipping details
+        def input_field_by_xpath(xpath, parser_attr):
+            name_field = WebDriverWait(driver, 10).until(
+                                EC.element_to_be_clickable((By.XPATH, 
+                                xpath)))
+            # clear field
+            name_field.send_keys(Keys.CONTROL, 'a')
+            name_field.send_keys(Keys.BACK_SPACE)
+
+            # fill field
+            name_field.send_keys(parser_attr)
+        
+        input_field_by_xpath('//*[@id="toData.contactName"]', parser.name)
+        input_field_by_xpath('//*[@id="toData.addressLine1"]', parser.address)
+        input_field_by_xpath('//*[@id="toData.zipPostalCode"]', parser.zip)
+        input_field_by_xpath('//*[@id="toData.city"]', parser.town)
+        state_input = Select(driver.find_element_by_xpath('//*[@id="toData.stateProvinceCode"]'))
+        state_input.select_by_value(parser.state)
+
+        # TODO: phone number sometimes doesn't input correctly.  Need to figure out why
+        sleep(0.25)
+        input_field_by_xpath('//*[@id="toData.phoneNumber"]', '9785059671')
+        sleep(0.25)
+
+        if parser.address2:
+            input_field_by_xpath('//*[@id="toData.addressLine2"]', parser.address2)
+
+        shipment_type = Select(driver.find_element_by_id('psdData.serviceType'))
+        shipment_type.select_by_value('FedEx Ground')
+
+        # package dims and weight
+        shipment_type = Select(driver.find_element_by_id('psd.mps.row.dimensions.0'))
+
+        # TODO: how to wait on Select
+        sleep(0.25)
+
+        shipment_type.select_by_value('manual')
+
+        WebDriverWait(driver, 10).until(
+                            EC.element_to_be_clickable((By.XPATH, '//*[@id="psd.mps.row.dimensionLength.0"]'))).send_keys(length)
+        WebDriverWait(driver, 10).until(
+                            EC.element_to_be_clickable((By.XPATH, '//*[@id="psd.mps.row.dimensionWidth.0"]'))).send_keys(width)
+        WebDriverWait(driver, 10).until(
+                            EC.element_to_be_clickable((By.XPATH, '//*[@id="psd.mps.row.dimensionHeight.0"]'))).send_keys(height)
+
+        input_field_by_xpath('//*[@id="psd.mps.row.weight.0"]', weight)
+
+
+        
+
+
+        input('kill?')
         exit()
+
+
 
 if __name__ == "__main__":
     main()

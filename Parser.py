@@ -47,7 +47,7 @@ class AddressParser(object):
         self.name = name
         self.address = address
         self.town = town
-        self.state = state
+        self.state = state.upper()
         self.zip = zip_code
 
 if __name__ == '__main__':
