@@ -1,6 +1,6 @@
 import sys
 import os
-import urllib
+import urllib.request
 from Parser import AddressParser
 from time import sleep
 import datetime
@@ -15,7 +15,9 @@ from selenium.webdriver.support.ui import Select
 
 options = webdriver.ChromeOptions()
 options.add_argument("--disable-blink-features=AutomationControlled")
+options.add_argument("--window-size=1600,900")
 options.binary_location = r"/usr/bin/google-chrome-stable"
+
 executable_path = os.path.dirname(os.path.abspath(__file__)) + "/chromedriver"
 
 def main():
@@ -58,13 +60,13 @@ def main():
             username_field = WebDriverWait(driver, 10).until(
                                 EC.element_to_be_clickable((By.NAME, 'user')))
 
-            username_field.send_keys(Keys.CONTROL, 'a')
+            username_field.send_keys(Keys.CONTROL, 'a', Keys.BACKSPACE)
             username_field.send_keys(username)
 
             password_field = WebDriverWait(driver, 10).until(
                                 EC.element_to_be_clickable((By.NAME, 'pwd')))
 
-            password_field.send_keys(Keys.CONTROL, 'a')
+            password_field.send_keys(Keys.CONTROL, 'a', Keys.BACKSPACE)
             password_field.send_keys(pswd)
 
             driver.find_element_by_xpath('/html/body/div[1]/header/div/div/nav/div/div/div/div[1]/div/div/form/button').click()
@@ -73,6 +75,7 @@ def main():
         
         if count == 5:
             print('failed to login')
+            input()
             exit()
 
         # Open shipping tab
@@ -137,19 +140,18 @@ def main():
         WebDriverWait(driver, 10).until(
                             EC.element_to_be_clickable((By.XPATH, '//*[@id="confirm.ship.field"]'))).click()
 
-        WebDriverWait(driver, 10).until(
+        image = WebDriverWait(driver, 10).until(
                             EC.element_to_be_clickable((By.XPATH, '//*[@id="labelImage"]')))
 
-        with open('/mnt/c/Users/Anthony/OneDrive/Desktop/fedex_pdfs/' + datetime.datetime.now().strftime('%c') + '-' + parser.name + '.png', 'wb') as f:
+        filename = '/mnt/c/Users/Anthony/OneDrive/Desktop/fedex_pdfs/' + datetime.datetime.now().strftime('%c').replace(' ','') + '-' + parser.name + '.png'
+
+        with open(filename, 'wb') as f:
+            driver.execute_script("window.scrollTo(0, 100)") 
+            sleep(5)
             f.write(driver.find_element_by_xpath('//*[@id="labelImage"]').screenshot_as_png)
-
-
-        
-
 
         input('kill?')
         exit()
-
 
 
 if __name__ == "__main__":
