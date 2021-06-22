@@ -1,10 +1,10 @@
 import sys
 import os
 import urllib.request
-from Parser import AddressParser
-from time import sleep
 import datetime
+from time import sleep
 from getpass import getpass
+from Parser import AddressParser
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -102,17 +102,19 @@ def main():
         input_field_by_xpath('//*[@id="toData.addressLine1"]', parser.address)
         input_field_by_xpath('//*[@id="toData.zipPostalCode"]', parser.zip)
         input_field_by_xpath('//*[@id="toData.city"]', parser.town)
+        if parser.address2:
+            input_field_by_xpath('//*[@id="toData.addressLine2"]', parser.address2)
+        input_field_by_xpath('//*[@id="toData.city"]', parser.town)
+
         state_input = Select(driver.find_element_by_xpath('//*[@id="toData.stateProvinceCode"]'))
         state_input.select_by_value(parser.state)
 
-        # TODO: phone number sometimes doesn't input correctly.  Need to figure out why
+        # TODO: phone number sometimes doesn't input correctly. Added time delays for janky fix.
         sleep(.5)
         input_field_by_xpath('//*[@id="toData.phoneNumber"]', '9785059671')
         sleep(.5)
         driver.find_element_by_xpath('//*[@id="toData.phoneNumberExt"]').click()
 
-        if parser.address2:
-            input_field_by_xpath('//*[@id="toData.addressLine2"]', parser.address2)
 
         shipment_type = Select(driver.find_element_by_id('psdData.serviceType'))
         shipment_type.select_by_value('FedEx Ground')
@@ -147,11 +149,11 @@ def main():
 
         with open(filename, 'wb') as f:
             driver.execute_script("window.scrollTo(0, 100)") 
-            sleep(5)
+            sleep(1)
             f.write(driver.find_element_by_xpath('//*[@id="labelImage"]').screenshot_as_png)
 
-        input('kill?')
-        exit()
+        print('Label sucessfully downloaded!  Exiting...')
+        exit(0)
 
 
 if __name__ == "__main__":

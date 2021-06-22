@@ -20,7 +20,7 @@ class AddressParser(object):
         split_address = [add.strip() for add in addr]
         split_address = filter(lambda x: x, split_address)
 
-        for char in (',','.','\n','\r',):
+        for char in (',', '.', '"', "'", '\n', '\r'):
             split_address = [s.replace(char,'') for s in split_address]
 
         return split_address
@@ -42,11 +42,11 @@ class AddressParser(object):
         else:
             self.address2 = None
 
-        town, state, zip_code = townStateZip.split()
+        *town, state, zip_code = townStateZip.split()
 
         self.name = name
         self.address = address
-        self.town = town
+        self.town = ' '.join(town)
         self.state = state.upper()
         self.zip = zip_code
 
