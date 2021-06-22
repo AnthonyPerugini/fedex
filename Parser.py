@@ -1,4 +1,4 @@
-import pyperclip as pc
+import pyperclip
 
 class AddressParser(object):
     def __init__(self, file=None):
@@ -32,7 +32,7 @@ class AddressParser(object):
                 addr = f.readlines()[7:]
         else:
             # get address from clipboard if no file
-            addr = pc.paste().split('\n')
+            addr = pyperclip.paste().split('\n')
 
         name, address, *address2, townStateZip = self.clean_address(addr)
 
