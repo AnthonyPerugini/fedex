@@ -42,7 +42,10 @@ class AddressParser(object):
         else:
             self.address2 = None
 
-        town, state, zip_code = townStateZip.split()
+        print(townStateZip)
+
+        *town, state, zip_code = townStateZip.split()
+        town = ' '.join(town)
 
         self.name = name
         self.address = address
