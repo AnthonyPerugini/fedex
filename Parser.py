@@ -1,4 +1,4 @@
-import pyperclip as pc
+import pyperclip
 
 class AddressParser(object):
     def __init__(self, file=None):
@@ -20,7 +20,7 @@ class AddressParser(object):
         split_address = [add.strip() for add in addr]
         split_address = filter(lambda x: x, split_address)
 
-        for char in (',','.','\n','\r',):
+        for char in (',', '.', '"', "'", '\n', '\r'):
             split_address = [s.replace(char,'') for s in split_address]
 
         return split_address
@@ -32,7 +32,7 @@ class AddressParser(object):
                 addr = f.readlines()[7:]
         else:
             # get address from clipboard if no file
-            addr = pc.paste().split('\n')
+            addr = pyperclip.paste().split('\n')
 
         name, address, *address2, townStateZip = self.clean_address(addr)
 
@@ -42,14 +42,11 @@ class AddressParser(object):
         else:
             self.address2 = None
 
-        print(townStateZip)
-
         *town, state, zip_code = townStateZip.split()
-        town = ' '.join(town)
 
         self.name = name
         self.address = address
-        self.town = town
+        self.town = ' '.join(town)
         self.state = state.upper()
         self.zip = zip_code
 
