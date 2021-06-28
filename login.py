@@ -35,8 +35,9 @@ def main():
 
     parser = AddressParser(addr_file)
 
-    opt = input('0 for wheel, 1 for battery, 2 for charger: ')
-    (length, width, height), weight = {'0': ([28 ,28 ,8], 30), '1': ([8, 8, 16], 8), '2': ([6, 9, 2], 4)}[opt]
+    opt = input('0 for wheel, 1 for battery, 2 for charger, 3 for manual: ')
+    (length, width, height), weight = {'0': ([28 ,28 ,8], 30), '1': ([8, 8, 16], 8), '2': ([6, 9, 2], 4), \
+            '3': ([input('length: '), input('width: '), input('height: ')], input('weight: '))}[opt]
 
     print('confirm parameters below:\n--------')
     parser.dump()

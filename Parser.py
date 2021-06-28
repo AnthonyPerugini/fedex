@@ -1,6 +1,6 @@
 import pyperclip
 
-class AddressParser(object):
+class AddressParser():
     def __init__(self, file=None):
         if file:
             self.file = file
@@ -14,7 +14,8 @@ class AddressParser(object):
         print('Address1: ', self.address)
         if self.address2 is not None:
             print('Address2: ', self.address2)
-        print('City, State, Zip: ', self.town, self.state, self.zip)
+        print('City, State, Zip: ', end='')
+        print(self.town, self.state, self.zip, sep= ', ')
 
     def clean_address(self, addr):
         split_address = [add.strip() for add in addr]
@@ -22,7 +23,6 @@ class AddressParser(object):
 
         for char in (',', '.', '"', "'", '\n', '\r'):
             split_address = [s.replace(char,'') for s in split_address]
-
         return split_address
 
     def split_address(self):
@@ -51,5 +51,5 @@ class AddressParser(object):
         self.zip = zip_code
 
 if __name__ == '__main__':
-    p = AddressParser()
+    p = AddressParser('file.txt')
     p.dump()
