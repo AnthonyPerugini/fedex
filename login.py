@@ -146,9 +146,11 @@ def main():
         image = WebDriverWait(driver, 10).until(
                             EC.element_to_be_clickable((By.XPATH, '//*[@id="labelImage"]')))
 
-        filename = '/mnt/c/Users/Anthony/OneDrive/Desktop/fedex_pdfs/' + datetime.datetime.now().strftime('%c').replace(' ','') + '-' + parser.name + '.png'
+        path = '/mnt/c/Users/Anthony/OneDrive/Desktop/fedex_pdfs/'
 
-        with open(filename, 'wb') as f:
+        filename = parser.name + datetime.datetime.now().strftime('%f') + '.png'
+
+        with open(path + filename, 'wb') as f:
             driver.execute_script("window.scrollTo(0, 100)") 
             sleep(1)
             f.write(driver.find_element_by_xpath('//*[@id="labelImage"]').screenshot_as_png)
