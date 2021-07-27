@@ -15,7 +15,7 @@ from selenium.webdriver.support.ui import Select
 
 options = webdriver.ChromeOptions()
 options.add_argument("--disable-blink-features=AutomationControlled")
-options.add_argument("--window-size=1600,900")
+options.add_argument("--start-maximized")
 options.binary_location = r"/usr/bin/google-chrome-stable"
 
 executable_path = os.path.dirname(os.path.abspath(__file__)) + "/chromedriver"
@@ -36,8 +36,11 @@ def main():
     parser = AddressParser(addr_file)
 
     opt = input('0 for wheel, 1 for battery, 2 for charger, 3 for manual: ')
-    (length, width, height), weight = {'0': ([28 ,28 ,8], 30), '1': ([8, 8, 16], 8), '2': ([6, 9, 2], 4), \
-            '3': ([input('length: '), input('width: '), input('height: ')], input('weight: '))}[opt]
+
+    if opt == '3':
+        length, width, height, weight = input('length: '), input('width: '), input('height: '), input('weight: ')
+    else:
+        (length, width, height), weight = {'0': ([28 ,28 ,8], 30), '1': ([8, 8, 16], 8), '2': ([6, 9, 2], 4)}[opt]
 
     print('confirm parameters below:\n--------')
     parser.dump()
@@ -75,8 +78,7 @@ def main():
             count += 1
         
         if count == 5:
-            print('failed to login')
-            input()
+            input('failed to login, press any key to kill.')
             exit()
 
         # Open shipping tab
@@ -92,23 +94,19 @@ def main():
             name_field = WebDriverWait(driver, 10).until(
                                 EC.element_to_be_clickable((By.XPATH, 
                                 xpath)))
-            # clear field
+            sleep(.25)
             name_field.send_keys(Keys.CONTROL, 'a')
+            sleep(.25)
             name_field.send_keys(Keys.BACK_SPACE)
-
-            # fill field
+            sleep(.25)
             name_field.send_keys(parser_attr)
+            sleep(.25)
         
         input_field_by_xpath('//*[@id="toData.contactName"]', parser.name)
         input_field_by_xpath('//*[@id="toData.addressLine1"]', parser.address)
         input_field_by_xpath('//*[@id="toData.zipPostalCode"]', parser.zip)
         input_field_by_xpath('//*[@id="toData.city"]', parser.town)
-        if parser.address2:
-            input_field_by_xpath('//*[@id="toData.addressLine2"]', parser.address2)
-        input_field_by_xpath('//*[@id="toData.city"]', parser.town)
 
-        state_input = Select(driver.find_element_by_xpath('//*[@id="toData.stateProvinceCode"]'))
-        state_input.select_by_value(parser.state)
 
         # TODO: phone number sometimes doesn't input correctly. Added time delays for janky fix.
         sleep(.5)
@@ -116,25 +114,23 @@ def main():
         sleep(.5)
         driver.find_element_by_xpath('//*[@id="toData.phoneNumberExt"]').click()
 
+        if parser.address2:
+            input_field_by_xpath('//*[@id="toData.addressLine2"]', parser.address2)
+
+        state_input = Select(driver.find_element_by_xpath('//*[@id="toData.stateProvinceCode"]'))
+        state_input.select_by_value(parser.state)
 
         shipment_type = Select(driver.find_element_by_id('psdData.serviceType'))
         shipment_type.select_by_value('FedEx Ground')
 
         # package dims and weight
         shipment_type = Select(driver.find_element_by_id('psd.mps.row.dimensions.0'))
-
-        # TODO: how to wait on Select
         sleep(0.25)
-
         shipment_type.select_by_value('manual')
 
-        WebDriverWait(driver, 10).until(
-                            EC.element_to_be_clickable((By.XPATH, '//*[@id="psd.mps.row.dimensionLength.0"]'))).send_keys(length)
-        WebDriverWait(driver, 10).until(
-                            EC.element_to_be_clickable((By.XPATH, '//*[@id="psd.mps.row.dimensionWidth.0"]'))).send_keys(width)
-        WebDriverWait(driver, 10).until(
-                            EC.element_to_be_clickable((By.XPATH, '//*[@id="psd.mps.row.dimensionHeight.0"]'))).send_keys(height)
-
+        input_field_by_xpath('//*[@id="psd.mps.row.dimensionLength.0"]', length)
+        input_field_by_xpath('//*[@id="psd.mps.row.dimensionWidth.0"]', width)
+        input_field_by_xpath('//*[@id="psd.mps.row.dimensionHeight.0"]', height)
         input_field_by_xpath('//*[@id="psd.mps.row.weight.0"]', weight)
 
         WebDriverWait(driver, 10).until(
@@ -155,7 +151,7 @@ def main():
             sleep(1)
             f.write(driver.find_element_by_xpath('//*[@id="labelImage"]').screenshot_as_png)
 
-        print('Label sucessfully downloaded!  Exiting...')
+        input(f'Label sucessfully downloaded to {path}. Press any button to exit.')
         exit(0)
 
 
