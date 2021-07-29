@@ -51,14 +51,11 @@ def main():
         exit()
 
     with webdriver.Chrome(executable_path=executable_path, options=options) as driver:
-
-        # Login to FedEx
+        # Login to FedEx, max 5 attempts
         driver.get('https://www.fedex.com/en-us/home.html')
-
         driver.find_element_by_id('fxg-dropdown-signIn').click()
 
         count = 0
-
         while driver.find_element_by_xpath('//*[@id="fxg-dropdown-signIn"]/span').text == 'Sign Up or Log In' and count < 5:
 
             username_field = WebDriverWait(driver, 10).until(
@@ -89,30 +86,30 @@ def main():
                             EC.element_to_be_clickable((By.XPATH, 
                             '/html/body/div[1]/header/div/div/nav/div/ul/div[1]/li/div/div[1]/div/a'))).click()
 
-        # input shipping details
+        # input shipping details function
         def input_field_by_xpath(xpath, parser_attr):
             name_field = WebDriverWait(driver, 10).until(
                                 EC.element_to_be_clickable((By.XPATH, 
                                 xpath)))
-            sleep(.25)
-            name_field.send_keys(Keys.CONTROL, 'a')
-            sleep(.25)
-            name_field.send_keys(Keys.BACK_SPACE)
-            sleep(.25)
-            name_field.send_keys(parser_attr)
-            sleep(.25)
-        
+
+            count = 0
+            while name_field.get_attribute('value') != str(parser_attr).strip() and count < 15:
+                x = name_field.get_attribute('value') 
+                name_field.send_keys(Keys.CONTROL, 'a')
+                name_field.send_keys(Keys.BACK_SPACE)
+                name_field.send_keys(parser_attr)
+                count += 1
+
+            return name_field
+
+
         input_field_by_xpath('//*[@id="toData.contactName"]', parser.name)
         input_field_by_xpath('//*[@id="toData.addressLine1"]', parser.address)
         input_field_by_xpath('//*[@id="toData.zipPostalCode"]', parser.zip)
         input_field_by_xpath('//*[@id="toData.city"]', parser.town)
-
-
-        # TODO: phone number sometimes doesn't input correctly. Added time delays for janky fix.
-        sleep(.5)
-        input_field_by_xpath('//*[@id="toData.phoneNumber"]', '9785059671')
-        sleep(.5)
-        driver.find_element_by_xpath('//*[@id="toData.phoneNumberExt"]').click()
+        sleep(0.5)
+        input_field_by_xpath('//*[@id="toData.phoneNumber"]', '9785059671\t')
+        sleep(0.5)
 
         if parser.address2:
             input_field_by_xpath('//*[@id="toData.addressLine2"]', parser.address2)
