@@ -2,12 +2,14 @@ import pyperclip
 
 class AddressParser():
     def __init__(self, file=None):
+
         if file:
             self.file = file
         else:
             self.file = None
 
         self.split_address()
+
 
     def dump(self):
         print('Full Name: ', self.name)

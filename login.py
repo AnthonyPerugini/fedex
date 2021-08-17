@@ -26,14 +26,16 @@ def main():
     with open('pass.txt') as f:
         username, pswd = f.read().split()
 
-    assert len(sys.argv) <= 2
-    addr_file = sys.argv[1:]
-    if addr_file:
-        addr_file, = addr_file
-    else:
-        addr_file = None
+#     assert len(sys.argv) <= 2
+#     addr_file = sys.argv[1:]
+#     if addr_file:
+#         addr_file, = addr_file
+#     else:
+#         addr_file = None
+# 
+#     print(addr_file)
 
-    parser = AddressParser(addr_file)
+    parser = AddressParser()
 
     opt = input('0 for wheel, 1 for battery, 2 for charger, 3 for manual: ')
 
